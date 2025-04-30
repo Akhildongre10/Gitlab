@@ -1,0 +1,230 @@
+openapi: 3.0.3
+info:
+  title: Armory Inventory Management APIs
+  description: APIs for managing AIM (Armory Inventory Management)
+  version: 1.0.0
+
+tags:
+  - name: AdminInvite
+    description: Operations related to managing SuperAdmin.
+security:
+  - BearerAuth: []
+
+paths:
+  /admin/invite:
+    get:
+      summary: Get all admin invites
+      operationId: getAllAdminInvites
+      tags:
+        - AdminInvite
+#      security:
+#        - BearerAuth: [ ]
+      responses:
+        '200':
+          description: A list of all admin invites
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminInviteResponse'
+        '403':
+          description: Forbidden - Access Denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInviteResponse'
+              example:
+                error: "Forbidden"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInviteResponse'
+              example:
+                error: "Internal server error"
+    post:
+      summary: Send Admin Invite
+      operationId: sendAdminInvite
+      tags:
+        - AdminInvite
+#      security:
+#        - BearerAuth: [ ]
+      description: The POST Admin Invites API endpoint is designed to create a record for admin invites and send an invitation email to the specified admin user. This process involves generating an invite token and sending an email using a predefined template.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminInviteRequest'
+      responses:
+        '201':
+          description: Invite sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInviteResponse'
+              example:
+                message: "Invite sent successfully."
+        '400':
+          description: Missing or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInviteResponse'
+              example:
+                error: "Missing email or full name"
+        '404':
+          description: Organization or super admin not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInviteResponse'
+              example:
+                error: "Organization not found"
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInviteResponse'
+              example:
+                error: "Internal server error occurred"
+
+  /admin/invite/{inviteId}:
+    put:
+      summary: Update Admin Invite
+      operationId: updateAdminInvite
+      tags:
+        - AdminInvite
+      description: The PUT Admin Invites API endpoint is used to update an existing admin invite. This can be used to resend the invitation or update the email/other information for the invite.
+      parameters:
+        - name: inviteId
+          in: path
+          required: true
+          description: The unique identifier for the admin invite.
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminInviteRequest'
+      responses:
+        '200':
+          description: Invite updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInviteResponse'
+              example:
+                message: "Invite updated successfully."
+        '400':
+          description: Missing or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInviteResponse'
+              example:
+                error: "Missing or invalid email"
+        '404':
+          description: Invite not found or Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInviteResponse'
+              example:
+                error: "Invite not found"
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInviteResponse'
+              example:
+                error: "Internal server error occurred"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AdminInviteRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          description: The email address of the invited admin.
+        fullName:
+          type: string
+          description: The full name of the invited admin.
+        organizationId:
+          type: integer
+          format: int64
+          description: The organization Id.
+      required:
+        - email
+        - fullName
+        - organizationId
+    AdminInviteResponse:
+      oneOf:
+        - $ref: '#/components/schemas/AdminInviteSuccessResponse'
+        - $ref: '#/components/schemas/AdminInviteErrorResponse'
+        - $ref: '#/components/schemas/AdminInviteGetResponse'
+
+    AdminInviteErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Error message here"
+      required:
+        - error
+
+    AdminInviteSuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Invite sent successfully."
+      required:
+        - message
+
+    AdminInviteGetResponse:
+      type: object
+      properties:
+        email:
+          type: string
+          description: The email address of the invited admin.
+        fullName:
+          type: string
+          description: The full name of the invited admin.
+        organizationName:
+          type: string
+          description: The full name of the invited admin.
+        invitedBy:
+          type: string
+          description: The full name of the invited admin.
+        status:
+          type: string
+          description: The status of the invited admin.
+        expiresAt:
+          type: string
+          format: date-time
+          description: The timestamp when the invite will expire.
+      required:
+        - email
+        - fullName
+        - organizationName
+        - invitedBy
+        - status
+        - expiresAt
+
+
+
+

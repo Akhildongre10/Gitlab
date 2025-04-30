@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.4.3</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.armory</groupId>
+	<artifactId>WeaponVault</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>WeaponVault</name>
+	<description>WeaponVault is a cloud-based platform for managing and tracking assets, personnel, and operational records, specifically designed for law enforcement, military, and security organizations. It provides real-time visibility into weapons, gear, ammunition, and personnel certifications, ensuring compliance, operational efficiency, and security.</description>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	<properties>
+		<java.version>17</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.8.6</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>1.6.3</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct-processor -->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-processor</artifactId>
+			<version>1.6.3</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api -->
+		<dependency>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+		</dependency>
+		<!--		OpenAPI Dependencies-->
+		<dependency>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>0.2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<!-- Maven Compiler Plugin (for Lombok + MapStruct Annotation Processor) -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.30</version>
+						</path>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>1.6.3</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+
+			<!--	OpenAPI plugin    -->
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>7.11.0</version>
+				<executions>
+					<execution>
+						<id>generate-org-api</id> <!-- unique ID -->
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<!--							<generateSupportingFiles>false</generateSupportingFiles>-->
+							<!--							<library>jakarta</library>-->
+							<configOptions>
+								<dateLibrary>java8</dateLibrary>
+								<delegatePattern>true</delegatePattern>
+								<useSpringBoot3>true</useSpringBoot3>
+								<useJakartaEe>true</useJakartaEe>
+							</configOptions>
+							<inputSpec>${project.basedir}/AIM-OpenAPI.yaml</inputSpec>
+							<generatorName>spring</generatorName>
+							<output>${project.basedir}</output>
+							<skipOverwrite>false</skipOverwrite>
+							<ignoreFileOverride>${project.basedir}/.aim-generator-ignore</ignoreFileOverride>
+							<modelPackage>com.armory.WeaponVault.entityDTO</modelPackage>
+							<apiPackage>com.armory.WeaponVault.organizationApi</apiPackage>
+
+							<typeMappings>
+								<typeMapping>DateTime=LocalDateTime</typeMapping>
+								<typeMapping>Date=Date</typeMapping>
+							</typeMappings>
+							<importMappings>
+								<importMapping>LocalDateTime=java.time.LocalDateTime</importMapping>
+								<importMapping>Date=java.util.Date</importMapping>
+							</importMappings>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-admin-invites-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<configOptions>
+								<dateLibrary>java8</dateLibrary>
+								<delegatePattern>true</delegatePattern>
+								<useSpringBoot3>true</useSpringBoot3>
+								<useJakartaEe>true</useJakartaEe>
+							</configOptions>
+							<inputSpec>${project.basedir}/AdminInvites-AIM-OpenAPI.yaml</inputSpec>
+							<generatorName>spring</generatorName>
+							<output>${project.basedir}</output>
+							<skipOverwrite>true</skipOverwrite>
+							<ignoreFileOverride>${project.basedir}/.aim-generator-ignore</ignoreFileOverride>
+							<modelPackage>com.armory.WeaponVault.entityDTO</modelPackage>
+							<apiPackage>com.armory.WeaponVault.APIs.adminInvitesApi</apiPackage>
+
+							<typeMappings>
+								<typeMapping>DateTime=LocalDateTime</typeMapping>
+								<typeMapping>Date=Date</typeMapping>
+							</typeMappings>
+							<importMappings>
+								<importMapping>LocalDateTime=java.time.LocalDateTime</importMapping>
+								<importMapping>Date=java.util.Date</importMapping>
+							</importMappings>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!--   Maven Clean	-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${project.basedir}/src/main/java/com/armory/WeaponVault/organizationApi</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+						</fileset>
+						<fileset>
+							<directory>${project.basedir}/src/main/java/com/armory/WeaponVault/APIs/adminInvitesApi</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+						</fileset>
+						<fileset>
+							<directory>${project.basedir}/src/main/java/com/armory/WeaponVault/entityDTO</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+						</fileset>
+						<fileset>
+							<directory>${project.basedir}/src/main/java/org</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+						</fileset>
+						<fileset>
+							<directory>${project.basedir}/.openapi-generator</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+
+			<!--	AntRun Plugin	-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>3.1.0</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.groovy</groupId>
+						<artifactId>groovy-all</artifactId>
+						<version>3.0.23</version>
+						<type>pom</type>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+
+						<configuration>
+							<target>
+								<!-- Delete generated test files -->
+								<delete dir="${project.basedir}/src/test/java/org" />
+<!--								<delete dir="${project.basedir}/src/main/java/org" />-->
+								<delete file="${project.basedir}/src/main/java/org/openapitools/OpenApiGeneratorApplication.java" />
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+		</plugins>
+	</build>
+
+
+</project>

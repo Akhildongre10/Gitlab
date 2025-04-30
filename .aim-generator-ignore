@@ -1,0 +1,13 @@
+# Ignore all resources
+/resources/*
+
+# Ignore specific files or directories (such as configuration or static resources)
+/src/main/resources/*
+/src/main/resources/application.properties
+/src/main/resources/static/*
+# Ignore any templates if you have custom ones
+/src/main/resources/templates/*
+/pom.xml
+/src/test/*
+# Ignore test folder and files under it
+test/

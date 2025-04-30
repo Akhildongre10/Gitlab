@@ -1,0 +1,1497 @@
+openapi: 3.0.3
+#openapi: 3.1.0
+info:
+  title: Armory Inventory Management APIs
+  description: APIs for managing AIM (Armory Inventory Management)
+  version: 1.0.0
+tags:
+  - name: SuperAdmin
+    description: Operations related to managing SuperAdmin.
+  - name: Organizations
+    description: Operations related to managing organizations.
+  - name: Departments
+    description: Operations related to managing departments.
+  - name: Manufacturer
+    description: Operations related to managing Manufacturer.
+  - name: Category
+    description: Operations related to managing Category.
+  - name: Inventory
+    description: Operations related to managing inventories.
+
+#security:
+#  - BearerAuth: []
+paths:
+#=======================================Super Admin APIs===========================================================
+  /auth/login:
+    post:
+      summary: Super Admin Login
+      operationId: superAdminLogin
+      tags:
+        - SuperAdmin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuperAdminRequest'
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperAdminResponse'
+              example:
+                token: "jwttoken"
+                tokenExpiry: "2023-04-01T12:00:00Z"
+                role: "SuperAdmin"
+                id: 12345
+                email: "john.doe@example.com"
+                name: "John Doe"
+                phoneNumber: "+1234567890"
+                createdAt: "2023-04-01T12:00:00Z"
+                updatedAt: "2023-04-01T12:00:00Z"
+        '400':
+          description: Missing email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperAdminResponse'
+              example:
+                message: "Email and password are required"
+                errorCode: "BAD_REQUEST"
+
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperAdminResponse'
+              example:
+                message: "Invalid email or password"
+                errorCode: "UNAUTHORIZED"
+
+        '403':
+          description: Account disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperAdminResponse'
+              example:
+                message: "Account is disabled"
+                errorCode: "FORBIDDEN"
+
+        '404':
+          description: Super Admin not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperAdminResponse'
+              example:
+                message: "Super Admin not found"
+                errorCode: "NOT_FOUND"
+
+
+  #=======================================Organization APIs===========================================================
+  /organizations:
+    get:
+      summary: Get all organizations
+      operationId: getAllOrganizations
+      tags:
+        - Organizations
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+#        - $ref: '#/components/parameters/Authorization'
+      security:
+        - BearerAuth: [ ]
+      responses:
+        '200':
+          description: A list of Organizations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrganizationDto'
+#        '500':
+#          description: Internal server error
+
+        '403':
+          description: Forbidden - Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
+
+    post:
+      summary: Create a new organization
+      operationId: createOrganization
+      tags:
+        - Organizations
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+#        - $ref: '#/components/parameters/Authorization'
+      security:
+        - BearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+      responses:
+        '201':
+          description: Organization created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        '400':
+          description: Bad request - Missing or invalid data
+        '403':
+          description: Forbidden - Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+        '409':
+          description: Organization with same name already present.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
+  /organizations/{organizationId}:
+    get:
+      summary: Get organization by organizationId
+      operationId: getOrganizationById
+      tags:
+        - Organizations
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          description: ID of the organization to fetch
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+#        - $ref: '#/components/parameters/Authorization'
+      security:
+        - BearerAuth: [ ]
+      responses:
+        '200':
+          description: Organization details by organizationId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        '403':
+          description: Forbidden - Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Organization not found"
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update organization by organization Id
+      operationId: updateOrganization
+      tags:
+        - Organizations
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          description: ID of the organization to update
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+#        - $ref: '#/components/parameters/Authorization'
+      security:
+        - BearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+      responses:
+        '200':
+          description: Organization updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        '403':
+          description: Forbidden - Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+        '404':
+          description: Organization data not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Organization not found"
+        '400':
+          description: Bad request - Missing or invalid data
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Delete Organization by organizationId
+      operationId: deleteOrganization
+      tags:
+        - Organizations
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          description: ID of the organization to delete
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+#        - $ref: '#/components/parameters/Authorization'
+      security:
+        - BearerAuth: [ ]
+      responses:
+        '200':
+          description: Organization deleted successfully
+        '403':
+          description: Forbidden - Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Organization not found"
+        '500':
+          description: Internal server error
+
+  #=======================================Department APIs===========================================================
+  /departments:
+    get:
+      summary: Get all departments
+      operationId: getAllDepartments
+      tags:
+        - Departments
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: A list of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepartmentDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
+    post:
+      summary: Create a new department
+      operationId: createDepartment
+      tags:
+        - Departments
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentDto'
+      responses:
+        '201':
+          description: Department created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentDto'
+        '400':
+          description: Bad request - Missing or invalid data
+        '409':
+          description: Department with same name already present.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
+  /departments/{departmentId}:
+    get:
+      summary: Get department by departmentId
+      operationId: getDepartmentById
+      tags:
+        - Departments
+      parameters:
+        - name: departmentId
+          in: path
+          required: true
+          description: ID of the department to fetch
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: Department details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentDto'
+        '404':
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Department not found"
+
+    put:
+      summary: Update department by department Id
+      operationId: updateDepartment
+      tags:
+        - Departments
+      parameters:
+        - name: departmentId
+          in: path
+          required: true
+          description: ID of the department to update
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentDto'
+      responses:
+        '200':
+          description: Department updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentDto'
+        '404':
+          description: Department data not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Department not found"
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Delete department by ID
+      operationId: deleteDepartment
+      tags:
+        - Departments
+      parameters:
+        - name: departmentId
+          in: path
+          required: true
+          description: ID of the department to delete
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: Department deleted successfully
+        '404':
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Department not found"
+        '500':
+          description: Internal server error
+
+  /departments/name/{departmentName}:
+    get:
+      summary: Get department by name
+      operationId: getDepartmentByName
+      tags:
+        - Departments
+      parameters:
+        - name: departmentName
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: Department details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentDto'
+        '404':
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Department not found"
+#
+#  /departments/organization/{organizationId}:
+#    get:
+#      summary: Get all departments by organization ID
+#      operationId: getDepartmentsByOrganizationId
+#      tags:
+#        - Departments
+#      parameters:
+#        - name: organizationId
+#          in: path
+#          required: true
+#          schema:
+#            type: integer
+#            format: int64
+#      responses:
+#        '200':
+#          description: A list of departments belonging to the organization
+#          content:
+#            application/json:
+#              schema:
+#                type: array
+#                items:
+#                  $ref: '#/components/schemas/DepartmentDto'
+#        '404':
+#          description: Department not found
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  error:
+#                    type: string
+#                    example: "Department not found"
+#
+#==============================================Manufacturer APIs====================================================
+
+  # Get all manufacturers
+  /manufacturer:
+    get:
+      summary: Get all manufacturers
+      operationId: getAllManufacturers
+      tags:
+        - Manufacturer
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: A list of manufacturers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ManufacturerDto'
+        '500':
+          description: Internal server error
+
+    post:
+      summary: Create a new manufacturer
+      operationId: createManufacturer
+      tags:
+        - Manufacturer
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManufacturerDtoInsert'
+      responses:
+        '201':
+          description: Manufacturer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturerDtoInsert'
+        '400':
+          description: Bad request - Missing or invalid data
+        '409':
+          description: Organization with same name already present.
+        '500':
+          description: Internal server error
+
+  # Get manufacturer by ID
+  /manufacturer/{manufacturerId}:
+    get:
+      summary: Get manufacturer by manufacturerId
+      operationId: getManufacturerById
+      tags:
+        - Manufacturer
+      parameters:
+        - name: manufacturerId
+          in: path
+          required: true
+          description: ID of the manufacturer to fetch
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: Manufacturer details by manufacturerId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturerDto'
+        '404':
+          description: Manufacturer not found
+        '500':
+          description: Internal server error
+
+    # Update manufacturer by ID
+    put:
+      summary: Update manufacturer by manufacturerId
+      operationId: updateManufacturer
+      tags:
+        - Manufacturer
+      parameters:
+        - name: manufacturerId
+          in: path
+          required: true
+          description: ID of the manufacturer to update
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManufacturerDtoInsert'
+      responses:
+        '200':
+          description: Manufacturer updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturerDtoInsert'
+        '404':
+          description: Manufacturer not found
+        '400':
+          description: Bad request - Missing or invalid data
+        '500':
+          description: Internal server error
+
+    # Delete manufacturer by ID
+    delete:
+      summary: Delete manufacturer by manufacturerId
+      operationId: deleteManufacturer
+      tags:
+        - Manufacturer
+      parameters:
+        - name: manufacturerId
+          in: path
+          required: true
+          description: ID of the manufacturer to delete
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: Manufacturer deleted successfully
+        '404':
+          description: Manufacturer not found
+        '500':
+          description: Internal server error
+#======================================Category APIs============================================================
+  /category:
+    get:
+      summary: Get all categories
+      operationId: getAllCategories
+      tags:
+        - Category
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: A list of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryDto'
+        '500':
+          description: Internal server error
+    post:
+      summary: Create a new category
+      operationId: createCategory
+      tags:
+        - Category
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDtoInsert'
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDtoInsert'
+        '400':
+          description: Bad request - Missing or invalid data
+        '409':
+          description: Category with the same name already exists
+        '500':
+          description: Internal server error
+
+  /category/{categoryId}:
+    get:
+      summary: Get category by ID
+      operationId: getCategoryById
+      tags:
+        - Category
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: ID of the category to fetch
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: Category details by ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDto'
+        '404':
+          description: Category not found
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update category by ID
+      operationId: updateCategory
+      tags:
+        - Category
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: ID of the category to update
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDtoInsert'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDtoInsert'
+        '404':
+          description: Category not found
+        '400':
+          description: Bad request - Missing or invalid data
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Delete category by ID
+      operationId: deleteCategory
+      tags:
+        - Category
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: ID of the category to delete
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: Category deleted successfully
+        '404':
+          description: Category not found
+        '500':
+          description: Internal server error
+
+  #=======================================Inventory APIs===========================================================
+
+  # Get all inventories
+  /inventory:
+    get:
+      summary: Get all inventories
+      operationId: getAllInventories
+      tags:
+        - Inventory
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'  # Repeated for consistency
+      responses:
+        '200':
+          description: A list of Inventories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryDto'
+        '500':
+          description: Internal server error
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  error:
+#                    type: string
+#                    example: "Internal server error"
+
+    # Create an inventory
+    post:
+      summary: Create a new inventory
+      operationId: createInventory
+      tags:
+        - Inventory
+      parameters:
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryDto_Id'
+      responses:
+        '201':
+          description: Inventory created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryDto'
+        '400':
+          description: Bad request - Missing or invalid data
+        '409':
+          description: Inventory with same serial no is already present.
+        '500':
+          description: Internal server error
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  error:
+#                    type: string
+#                    example: "Internal server error"
+
+  # Get inventory by ID
+  /inventory/{inventoryId}:
+    get:
+      summary: Get inventory by inventoryId
+      operationId: getInventoryById
+      tags:
+        - Inventory
+      parameters:
+        - name: inventoryId
+          in: path
+          required: true
+          description: ID of the inventory to fetch
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      responses:
+        '200':
+          description: Inventory details by inventoryId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryDto'
+        '404':
+          description: Inventory not found
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  error:
+#                    type: string
+#                    example: "Inventory not found"
+        '500':
+          description: Internal server error
+
+
+
+    # Update Inventory by Id
+    put:
+      summary: Update inventory by inventoryId
+      operationId: updateInventory
+      tags:
+        - Inventory
+      parameters:
+        - name: inventoryId
+          in: path
+          required: true
+          description: ID of the inventory to update
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryDto_Id'
+      responses:
+        '200':
+          description: Inventory updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryDto'
+        '404':
+          description: Inventory data not found
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  error:
+#                    type: string
+#                    example: "Inventory not found"
+        '400':
+          description: Bad request - Missing or invalid data
+
+        '500':
+          description: Internal server error
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  error:
+#                    type: string
+#                    example: "Internal server error"
+
+    delete:
+      summary: Delete inventory by inventoryId
+      operationId: deleteInventory
+      tags:
+        - Inventory
+      parameters:
+        - name: inventoryId
+          in: path
+          required: true
+          description: ID of the inventory to delete
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+
+      responses:
+        '200':
+          description: Inventory deleted successfully
+        '404':
+          description: Inventory not found
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  error:
+#                    type: string
+#                    example: "Inventory not found"
+        '500':
+          description: Internal server error
+
+
+  # Get inventory by serial number
+  /inventory/serial/{serialNo}:
+    get:
+      summary: Get inventory by serial number
+      operationId: getInventoryBySerialNo
+      tags:
+        - Inventory
+      parameters:
+        - name: serialNo
+          in: path
+          required: true
+          description: Serial number of the inventory to fetch
+          schema:
+            type: string
+        - $ref: '#/components/parameters/X-Tenant-ID'
+
+      responses:
+        '200':
+          description: Inventory details by serial number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryDto'
+        '404':
+          description: Inventory not found
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  error:
+#                    type: string
+#                    example: "Inventory not found"
+        '500':
+          description: Internal server error
+
+
+  # Get inventories by category ID
+  /inventory/category/{categoryId}:
+    get:
+      summary: Get inventories by categoryId
+      operationId: getInventoriesByCategoryId
+      tags:
+        - Inventory
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: Category ID to fetch associated inventories
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Tenant-ID'
+
+      responses:
+        '200':
+          description: List of inventories for the specified category ID
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryDto'
+        '404':
+          description: No inventory found for the category
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  error:
+#                    type: string
+#                    example: "No inventory found for the category"
+        '500':
+          description: Internal server error
+
+#  # Get inventory by asset item number
+#  /inventory/assetItem/{assetItemNumber}:
+#    get:
+#      summary: Get inventory by asset item number
+#      operationId: getInventoryByAssetItemNumber
+#      tags:
+#        - Inventory
+#      parameters:
+#        - name: assetItemNumber
+#          in: path
+#          required: true
+#          description: Asset item number of the inventory to fetch
+#          schema:
+#            type: string
+#        - $ref: '#/components/parameters/X-Tenant-ID'
+#
+#      responses:
+#        '200':
+#          description: Inventory details by asset item number
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/InventoryDto'
+#        '404':
+#          description: Inventory not found
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  error:
+#                    type: string
+#                    example: "Inventory not found"
+#=============================================================================================================
+
+
+
+
+#=====================================================COMPONENTS===========================================================================
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    X-Tenant-ID:
+      name: X-Tenant-ID
+      in: header
+      description: Tenant identifier for multi-tenancy.
+      required: true
+      schema:
+        type: string
+#    Authorization:
+#      name: Authorization
+#      in: header
+#      description: "Bearer token for authentication. Format: `Bearer <token>`"
+#      required: true
+#      schema:
+#        type: string
+
+  schemas:
+#===============================================Super Admin DTOs===================================================================
+    SuperAdminRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          example: "email@example.com"
+        password:
+          type: string
+          example: "password"
+      required:
+        - email
+        - password
+    SuperAdminResponse:
+      oneOf:
+        - $ref: '#/components/schemas/SuperAdminSuccessResponse'
+        - $ref: '#/components/schemas/SuperAdminErrorResponse'
+
+    SuperAdminSuccessResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "***.."
+        tokenExpiry:
+          type: string
+          format: date-time
+          description: The timestamp when the SuperAdmin was created.
+        role:
+          type: string
+          example: "role"
+        id:
+          type: integer
+          format: int64
+          description: The unique identifier of the SuperAdmin.
+        email:
+          type: string
+          example: "email@example.com"
+        name:
+          type: string
+          example: "John Doe"
+        phoneNumber:
+          type: string
+          example: "+1234567890"
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the SuperAdmin was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the SuperAdmin was last updated.
+
+    SuperAdminErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Error message here"
+      required:
+        - error
+#===============================================Organization DTOs===================================================================
+    OrganizationDto:
+      type: object
+      properties:
+        organizationId:
+          type: integer
+          format: int64
+          description: The unique identifier of the organization.
+        organizationName:
+          type: string
+          description: The unique Name of the organization.
+        organizationDetails:
+          type: object
+          additionalProperties: true  # Allows storing arbitrary JSON data
+          description: A JSON object containing details such as organization name, username, email, and phone number
+          example:
+            email: "admin@weaponvault.com"
+            phone_no: "+1234567890"
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the organization was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the organization was last updated.
+        status:
+          type: string
+          description: The status of the organization (active, inactive, etc.)
+#        departments: # One-to-many relationship to departments
+#          type: array
+#          items:
+#            $ref: '#/components/schemas/DepartmentDto'
+      required:
+        - organizationName
+        - organizationDetails
+
+    #Department Schema
+    DepartmentDto:
+      type: object
+      properties:
+        departmentId:
+          type: integer
+          format: int64
+          description: The unique identifier of the department.
+        departmentName:
+          type: string
+          description: The name of the department.
+        departmentDetails:
+          type: object
+          additionalProperties: true
+          description: A JSON object containing details about the department.
+          example:
+            department_code: "HR001"
+            department_head: "John Doe"
+            description: "Handles all human resources tasks."
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the department was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the department was last updated.
+#        organization:  # Many-to-one relationship back to the organization
+#          $ref: '#/components/schemas/OrganizationDto'
+      required:
+        - departmentName
+        - departmentDetails
+
+
+    # Manufacturer Schemas
+    ManufacturerDtoInsert:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the manufacturer
+
+    ManufacturerDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the manufacturer
+        name:
+          type: string
+          description: Name of the manufacturer
+        status:
+          type: string
+          description: Status of the manufacturer (e.g., active, inactive)
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the manufacturer was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the manufacturer was last updated
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryDto'
+          description: List of categories associated with the manufacturer.
+      required:
+        - name
+
+    #Category Schema
+    CategoryDto:
+      type: object
+      properties:
+        categoryId:
+          type: integer
+          format: int64
+          description: The unique identifier for the category.
+        manufacturers: # Many-to-many relationship with ManufacturerDto
+          type: array
+          items:
+            $ref: '#/components/schemas/ManufacturerDto'
+          description: List of manufacturers associated with the category.
+        categoryName:
+          type: string
+          description: The name of the category.
+        categoryDetails:
+          type: object
+          additionalProperties: true
+          description: A JSON object containing various details about the category (e.g., model, type, etc.).
+          example:
+            model: "AR-15"
+            type: "Rifle"
+            required_training: "Basic"
+            required_qualification: "Marksman"
+            caliber: "5.56mm"
+            length: "36 inches"
+            inspection_months: "12"
+            maintenance_months: "6"
+            description: "A standard assault rifle."
+
+        inventories: # One-to-many association with InventoryDto
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryDto'
+          description: List of inventories associated with the category.
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the category was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the category was last updated.
+      required:
+        - categoryName
+        - categoryDetails
+
+    CategoryDtoInsert:
+      type: object
+      properties:
+        categoryName:
+          type: string
+          description: The name of the category.
+        categoryDetails:
+          type: object
+          additionalProperties: true
+          description: A JSON object containing various details about the category (e.g., model, type, etc.).
+          example:
+            model: "AR-15"
+            type: "Rifle"
+            required_training: "Basic"
+            required_qualification: "Marksman"
+            caliber: "5.56mm"
+            length: "36 inches"
+            inspection_months: "12"
+            maintenance_months: "6"
+            description: "A standard assault rifle."
+        manufacturerIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [ 1, 2, 3 ]
+      required:
+        - categoryName
+        - categoryDetails
+        - manufacturerIds
+
+
+
+    #Inventory Dto
+    InventoryDto:
+      type: object
+      properties:
+        inventoryId:
+          type: integer
+          format: int64
+          description: The unique identifier for the inventory item.
+#        categoryId:
+#          type: integer
+#          format: int64
+#          description: The unique identifier of the associated category.
+        category: # Many-to-one association with CategoryDto
+          $ref: '#/components/schemas/CategoryDto'
+          description: The associated category for the inventory item.
+#        assetItemNumber:
+#          type: string
+#          description: The unique asset item number for the inventory.
+        serialNo:
+          type: string
+          description: The serial number of the inventory item.
+        inventoryDetails:
+          type: object
+          additionalProperties: true
+          description: A JSON object containing varisous details about the inventory item (e.g., lot number, rebuild date, etc.).
+          example:
+            model: "AQW"
+            assetItemNumber: "AS123"
+            site: "site1"
+            nfa_category: "Rifle"
+            description: "Brand new rifle, fully assembled and tested."
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the inventory item was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the inventory item was last updated.
+      required:
+        - serialNo
+        - categoryId
+
+
+    #Inventory Dto
+    InventoryDto_Id:
+      type: object
+      properties:
+        inventoryId:
+          type: integer
+          format: int64
+          description: The unique identifier for the inventory item.
+        categoryId:
+          type: integer
+          format: int64
+          description: The unique identifier of the associated category.
+#        category: # Many-to-one association with CategoryDto
+#          $ref: '#/components/schemas/CategoryDto'
+#          description: The associated category for the inventory item.
+        #        assetItemNumber:
+        #          type: string
+        #          description: The unique asset item number for the inventory.
+        serialNo:
+          type: string
+          description: The serial number of the inventory item.
+        inventoryDetails:
+          type: object
+          additionalProperties: true
+          description: A JSON object containing varisous details about the inventory item (e.g., lot number, rebuild date, etc.).
+          example:
+            model: "AQW"
+            assetItemNumber: "AS123"
+            site: "site1"
+            nfa_category: "Rifle"
+            description: "Brand new rifle, fully assembled and tested."
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the inventory item was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the inventory item was last updated.
+      required:
+        - serialNo
+        - categoryId
+

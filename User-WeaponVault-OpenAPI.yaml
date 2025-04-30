@@ -1,0 +1,166 @@
+openapi: 3.1.0
+info:
+  title: Weapon Vault User API
+  description: APIs for managing users in the Weapon Vault
+  version: 1.0.0
+
+# servers:
+#   - url: http://localhost:8080/api/v1
+paths:
+  /users:
+    post:
+      summary: Create a new user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request - Missing or invalid data
+        '500':
+          description: Internal server error
+
+
+    get:
+      summary: Get all users
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: List of all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Internal server error
+
+
+  /users/{employeeId}:
+    get:
+      summary: Get user by employee ID
+      operationId: getUserByEmployeeId
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+    put:
+      summary: Update user details by Employee ID
+      operationId: updateUser
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request - Invalid data
+        '404':
+          description: User not found
+
+    delete:
+      summary: Delete user by employee ID
+      operationId: deleteUser
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted successfully
+        '404':
+          description: User not found
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "The unique identifier for the User."
+          example: 1
+        username:
+          type: string
+          description: User's username
+        displayName:
+          type: string
+          description: User's Display name
+        password:
+          type: string
+          description: User's password
+        confirmPassword:
+          type: string
+          description: User's confirm password
+        employeeId:
+          type: string
+          description: User's employee ID
+        role:
+          type: string
+          description: User's role
+        department:
+          type: string
+          description: User's department
+        supervisor:
+          type: string
+          description: User's supervisor
+        email:
+          type: string
+          description: User's email address
+        phoneNo:
+          type: string
+          description: User's phone number
+        title:
+          type: string
+          description: User's title
+      required:
+        - username
+        - displayName
+        - password
+        - confirmPassword
+        - employeeId
+        - role
+        - department
+        - supervisor
+        - email
+        - phoneNo
+        - title
+#====================================================================================
