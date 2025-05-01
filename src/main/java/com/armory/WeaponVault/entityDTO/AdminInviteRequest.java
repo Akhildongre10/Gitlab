@@ -19,7 +19,7 @@ import jakarta.annotation.Generated;
  * AdminInviteRequest
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-29T13:52:58.938669090+05:30[Asia/Kolkata]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-01T14:23:19.910106306+05:30[Asia/Kolkata]", comments = "Generator version: 7.11.0")
 public class AdminInviteRequest {
 
   private String email;

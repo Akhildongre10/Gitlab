@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-29T13:52:58.938669090+05:30[Asia/Kolkata]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-01T14:23:19.910106306+05:30[Asia/Kolkata]", comments = "Generator version: 7.11.0")
 @Validated
 @Tag(name = "AdminInvite", description = "Operations related to managing SuperAdmin.")
 public interface AdminApi {

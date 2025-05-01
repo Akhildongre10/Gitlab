@@ -19,7 +19,7 @@ import jakarta.annotation.Generated;
  * A delegate to be called by the {@link AdminApiController}}.
  * Implement this interface with a {@link org.springframework.stereotype.Service} annotated class.
  */
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-29T13:52:58.938669090+05:30[Asia/Kolkata]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-01T14:23:19.910106306+05:30[Asia/Kolkata]", comments = "Generator version: 7.11.0")
 public interface AdminApiDelegate {
 
     default Optional<NativeWebRequest> getRequest() {

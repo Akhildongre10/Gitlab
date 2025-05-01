@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-29T13:52:58.142954239+05:30[Asia/Kolkata]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-01T14:23:18.722101711+05:30[Asia/Kolkata]", comments = "Generator version: 7.11.0")
 @Controller
 @RequestMapping("${openapi.armoryInventoryManagementAPIs.base-path:}")
 public class InventoryApiController implements InventoryApi {
